@@ -3,11 +3,11 @@ import cv2
 import mediapipe as mp
 import numpy as np
 from flask import Flask, render_template, request, jsonify, Response
-import yt_dlp as youtube_dl  # Use yt-dlp instead of youtube-dl
+import yt_dlp  # yt-dlp for downloading YouTube videos
 import tempfile
 import os
 from werkzeug.utils import secure_filename
-from models.model import EfficientNetB0
+from models.model import EfficientNetB0  # Assuming this is defined in your models folder
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -20,23 +20,19 @@ face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.9)
 # Set the device based on GPU availability
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-import torch
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = EfficientNetB0()  # Assuming this is already defined in your code
-model.load_state_dict(torch.load('/content/DeepFakeClass1-/models/deepfake_cnn_optimized.pth', 
-                                 map_location=device))
+# Load your model
+model = EfficientNetB0()  # Assuming this is defined in your code
+model.load_state_dict(torch.load('/content/DeepFakeClass1-/models/deepfake_cnn_optimized.pth', map_location=device))
 model = model.to(device)
 model.eval()
 
 print("Model successfully loaded and ready for inference!")
 
-
 # Function to download video from YouTube
 def download_youtube_video(url):
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': tempfile.mktemp() + '.mp4',  # Use tempfile for temporary file
+        'outtmpl': tempfile.mktemp() + '.mp4',  # Save the video to a temp file
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(url, download=True)
@@ -117,9 +113,13 @@ def video_feed():
     if not url:
         return jsonify({'error': 'No video URL provided'}), 400
 
-    video_path = download_youtube_video(url)
+    try:
+        video_path = download_youtube_video(url)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
     return Response(process_video(video_path),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    app.run( port=8000,debug=True)
+    app.run(port=8000, debug=True)
