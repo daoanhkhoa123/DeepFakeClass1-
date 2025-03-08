@@ -7,6 +7,15 @@
 </head>
 <body>
     <h1>YouTube Video Stream</h1>
+    
+    <!-- Form to input a YouTube URL -->
+    <form method="POST" action="/">
+        <label for="youtube_url">Enter YouTube URL:</label>
+        <input type="text" id="youtube_url" name="youtube_url" placeholder="Paste YouTube URL here" required>
+        <button type="submit">Load Stream</button>
+    </form>
+
+    <h2>Video Stream:</h2>
     <img src="{{ url_for('video_feed') }}" alt="Video Stream">
 </body>
 </html>
