@@ -7,14 +7,30 @@
 </head>
 <body>
     <h1>Face Detection and Prediction (Real or Fake)</h1>
-    <form action="/process_video" method="post">
+    
+    <!-- Form to submit YouTube URL -->
+    <form id="url-form" action="/process_video" method="post">
         <label for="url">YouTube Video URL:</label>
         <input type="text" id="url" name="url" required>
         <button type="submit">Start Processing</button>
     </form>
 
+    <!-- Display live video feed -->
     <h2>Live Video Feed</h2>
-    <img src="{{ url_for('video_feed', url='https://www.youtube.com/watch?v=example_video_id') }}" width="640" height="360" />
+    <img id="video-stream" src="" width="640" height="360" />
+
+    <script>
+        // Handle the form submission
+        document.getElementById('url-form').addEventListener('submit', function (e) {
+            e.preventDefault();  // Prevent the form from submitting the default way
+
+            const url = document.getElementById('url').value;
+
+            // Update the video stream src
+            const videoStream = document.getElementById('video-stream');
+            videoStream.src = '/video_feed?url=' + encodeURIComponent(url);
+        });
+    </script>
 
 </body>
 </html>
