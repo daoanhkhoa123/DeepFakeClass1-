@@ -16,8 +16,15 @@ mp_face_detection = mp.solutions.face_detection
 mp_drawing = mp.solutions.drawing_utils
 face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.9)
 
-# Load your PyTorch model for face authenticity prediction (replace with your model)
-model = torch.load('models/deepfake_cnn_optimized.pth')  # Replace with the path to your PyTorch model
+import torch
+
+# Set the device based on GPU availability
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Use the device in your code
+model = torch.load('/content/DeepFakeClass1-/models/deepfake_cnn_optimized.pth', 
+                   map_location=device)
+model = model.to(device)  # Move the model to the selected device
 model.eval()  # Set the model to evaluation mode
 
 # Function to download video from YouTube
