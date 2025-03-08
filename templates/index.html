@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection and Prediction</title>
+</head>
+<body>
+    <h1>Face Detection and Prediction (Real or Fake)</h1>
+    <form action="/process_video" method="post">
+        <label for="url">YouTube Video URL:</label>
+        <input type="text" id="url" name="url" required>
+        <button type="submit">Start Processing</button>
+    </form>
+
+    <h2>Live Video Feed</h2>
+    <img src="{{ url_for('video_feed', url='https://www.youtube.com/watch?v=example_video_id') }}" width="640" height="360" />
+
+</body>
+</html>
