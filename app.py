@@ -1,25 +1,33 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 from vidgear.gears import CamGear
 import cv2
 
 app = Flask(__name__)
 
-from vidgear.gears import CamGear
-import cv2
-youtube_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"  
+youtube_url = "https://www.youtube.com/watch?v=VdAiKJTf5NY"
 
-
-# Video stream source (YouTube video URL)
 video_stream = CamGear(
     source=youtube_url, 
     stream_mode=True,
     logging=True
 ).start()
 
-
 # Route for index page
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    global video_stream
+    if request.method == 'POST':
+        new_url = request.form.get('youtube_url')
+        if new_url:
+            # Stop the current video stream
+            video_stream.stop()
+            # Update the video stream with the new URL
+            video_stream = CamGear(
+                source=new_url, 
+                stream_mode=True,
+                logging=True
+            ).start()
+    
     return render_template('index.html')
 
 # Generate video frames and stream
@@ -42,4 +50,4 @@ def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    app.run(port=8000,debug=True)
+    app.run(port=8000, debug=True)
