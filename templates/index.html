@@ -3,34 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Detection and Prediction</title>
+    <title>YouTube Video Stream</title>
 </head>
 <body>
-    <h1>Face Detection and Prediction (Real or Fake)</h1>
-    
-    <!-- Form to submit YouTube URL -->
-    <form id="url-form" action="/process_video" method="post">
-        <label for="url">YouTube Video URL:</label>
-        <input type="text" id="url" name="url" required>
-        <button type="submit">Start Processing</button>
-    </form>
-
-    <!-- Display live video feed -->
-    <h2>Live Video Feed</h2>
-    <img id="video-stream" src="" width="640" height="360" />
-
-    <script>
-        // Handle the form submission
-        document.getElementById('url-form').addEventListener('submit', function (e) {
-            e.preventDefault();  // Prevent the form from submitting the default way
-
-            const url = document.getElementById('url').value;
-
-            // Update the video stream src
-            const videoStream = document.getElementById('video-stream');
-            videoStream.src = '/video_feed?url=' + encodeURIComponent(url);
-        });
-    </script>
-
+    <h1>YouTube Video Stream</h1>
+    <img src="{{ url_for('video_feed') }}" alt="Video Stream">
 </body>
 </html>
