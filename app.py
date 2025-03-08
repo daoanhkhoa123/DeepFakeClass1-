@@ -7,7 +7,7 @@ import youtube_dl
 import tempfile
 import os
 from werkzeug.utils import secure_filename
-from model import EfficientNetB0
+from models.model import EfficientNetB0
 # Initialize Flask app
 app = Flask(__name__)
 
