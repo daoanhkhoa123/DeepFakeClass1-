@@ -1,7 +1,7 @@
+import torch
 import cv2
 import mediapipe as mp
 import numpy as np
-import tensorflow as tf
 from flask import Flask, render_template, request, jsonify
 import youtube_dl
 import tempfile
@@ -16,8 +16,9 @@ mp_face_detection = mp.solutions.face_detection
 mp_drawing = mp.solutions.drawing_utils
 face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.9)
 
-# Load your model for face authenticity prediction (replace with your model)
-model = tf.keras.models.load_model('path_to_your_model.h5')
+# Load your PyTorch model for face authenticity prediction (replace with your model)
+model = torch.load('models/deepfake_cnn_optimized.pth')  # Replace with the path to your PyTorch model
+model.eval()  # Set the model to evaluation mode
 
 # Function to download video from YouTube
 def download_youtube_video(url):
@@ -55,13 +56,17 @@ def process_video(video_path):
                 x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
                 face = frame[y:y+h, x:x+w]
                 
-                # Predict if the face is real or fake
+                # Predict if the face is real or fake using PyTorch model
                 face_resized = cv2.resize(face, (224, 224))  # Assuming model input size is 224x224
                 face_normalized = np.expand_dims(face_resized, axis=0) / 255.0  # Normalize the image
-                prediction = model.predict(face_normalized)
-                
-                # Display the prediction (Real/Fake) on the image
-                label = 'Real' if prediction[0][0] > 0.5 else 'Fake'
+                face_tensor = torch.tensor(face_normalized).permute(0, 3, 1, 2).float()  # Convert to tensor
+
+                # Perform inference
+                with torch.no_grad():  # Disable gradient calculation for inference
+                    prediction = model(face_tensor)
+
+                # Assuming the model outputs a binary classification (real or fake)
+                label = 'Real' if prediction.item() > 0.5 else 'Fake'
                 cv2.putText(frame, label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
         
         # Convert frame to JPEG for web display
